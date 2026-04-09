@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class UsuarioService {
+export class Usuario {
   // La URL de tu controlador de Spring Boot
   private API_URL = 'http://localhost:8080/api/usuarios';
 
