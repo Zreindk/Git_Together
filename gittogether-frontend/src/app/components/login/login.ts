@@ -11,9 +11,9 @@ import { Router } from '@angular/router';
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login {
-  loginData = { nombre: '', password: '' }; // Modelo vinculado al formulario
-  errorMessage = ''; // Variable para mostrar errores en el HTML
+export class Login { 
+  loginData = { identificador: '', password: '' }; 
+  errorMessage = ''; 
 
   constructor(private apiUsuario: Usuario, private router: Router) { } 
 
@@ -21,18 +21,23 @@ export class Login {
   onLogin(event: Event) {
     event.preventDefault();
     
+    // Ahora enviamos loginData que contiene { identificador, password }
     this.apiUsuario.login(this.loginData).subscribe({
       next: (res) => {
         console.log("Login exitoso", res);
-        // Guardamos información adicional del usuario (opcional)
-        localStorage.setItem('usuarioLogueado', JSON.stringify(res));
+        
+        // IMPORTANTE: En el Backend devolvemos un LoginResponse que tiene { token, usuario }
+        // Guardamos el objeto usuario que viene dentro de la respuesta
+        if (res && res.usuario) {
+            localStorage.setItem('usuarioLogueado', JSON.stringify(res.usuario));
+        }
         
         // Navegamos hacia la página principal del foro
         this.router.navigate(['/foro']);
       },
       error: (err) => {
-        // Manejamos el error si las credenciales son inválidas
-        this.errorMessage = "Datos incorrectos";
+        console.error("Error en el login:", err);
+        this.errorMessage = "Usuario o contraseña incorrectos";
       }
     });
   }

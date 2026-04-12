@@ -15,9 +15,11 @@ export class Usuario {
   login(datos: any): Observable<any> {
     return this.http.post<any>(`${this.API_URL}/login`, datos).pipe(
       tap(response => {
-        // Si el backend devuelve un token, lo guardamos en el almacenamiento local del navegador
+        // Guardamos el token en local storage
         if (response && response.token) {
           localStorage.setItem('auth_token', response.token);
+          // Guardamos los datos del usuario para el perfil
+          localStorage.setItem('usuarioLogueado', JSON.stringify(response.usuario));
         }
       })
     );
