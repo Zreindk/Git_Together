@@ -1,52 +1,252 @@
+/* Variables globales de consistencia (Igual que en Foro) */
+:host {
+    --bg-dark: #0f111a;
+    --bg-surface: #1a1d27;
+    --bg-surface-glass: rgba(26, 29, 39, 0.7);
+    --border-color: #2a2e3d;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --accent-color: #38bdf8;
+    --accent-hover: #0284c7;
+    --accent-glow: rgba(56, 189, 248, 0.4);
+    --gradient-brand: linear-gradient(135deg, #38bdf8, #818cf8);
+    --error-color: #ef4444;
+    --error-bg: rgba(239, 68, 68, 0.1);
+    --radius-lg: 20px;
+    --radius-md: 12px;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100vw;
+    background-color: var(--bg-dark);
+    position: fixed;
+    top: 0;
+    left: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+}
+
+/* Efectos de Luz de Fondo Animados */
+.ambient-glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: 0;
+    opacity: 0.5;
+    animation: drift 10s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bg-blur-1 {
+    width: 400px;
+    height: 400px;
+    background: rgba(56, 189, 248, 0.3);
+    top: -10%;
+    right: -10%;
+}
+
+.bg-blur-2 {
+    width: 500px;
+    height: 500px;
+    background: rgba(129, 140, 248, 0.2);
+    bottom: -20%;
+    left: -10%;
+    animation-delay: -5s;
+}
+
+@keyframes drift {
+    0% { transform: translateY(0px) scale(1); }
+    100% { transform: translateY(40px) scale(1.1); }
+}
+
+/* Contenedor Principal */
 .login-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
 }
 
 .login-card {
-  background: white;
-  padding: 40px;
-  border-radius: 15px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
+    background: var(--bg-surface-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 48px 40px;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.logo { width: 60px; margin-bottom: 10px; }
-
-.input-group { margin-bottom: 20px; text-align: left; }
-
-.input-group label { display: block; font-weight: 600; margin-bottom: 5px; color: #333; }
-
-.input-group input {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-sizing: border-box;
+@keyframes slideUpFade {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
+/* Header & Logo */
+.logo-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+
+.logo-icon {
+    width: 56px;
+    height: 56px;
+    color: var(--accent-color);
+    filter: drop-shadow(0 0 12px var(--accent-glow));
+}
+
+.title {
+    margin: 0 0 8px;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: var(--gradient-brand);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    margin: 0 0 32px;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+/* Formulario & Inputs */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-group {
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 16px;
+    width: 20px;
+    height: 20px;
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 14px 16px 14px 44px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.input-wrapper input::placeholder {
+    color: #475569;
+}
+
+.input-wrapper input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}
+
+.input-wrapper input:focus + .input-icon,
+.input-wrapper input:not(:placeholder-shown) + .input-icon {
+    /* Mueve la logica de svg a enfrente desde el HTML si requieres cambiar el color en focus,
+       pero con selectores adyacentes el icono debe estar despues del input en el DOM. 
+       Alternativamente, el contenedor .input-wrapper:focus-within .input-icon se encarga */
+}
+
+.input-wrapper:focus-within .input-icon {
+    color: var(--accent-color);
+}
+
+/* Botón Iniciar Sesión */
 .btn-login {
-  width: 100%;
-  padding: 12px;
-  background: #764ba2;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    margin-top: 8px;
+    background: var(--gradient-brand);
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 14px 0 rgba(56, 189, 248, 0.39);
 }
 
-.btn-login:hover { background: #5a377d; }
+.btn-icon {
+    width: 18px;
+    height: 18px;
+    transition: transform 0.2s;
+}
 
-.error-msg { color: red; margin-top: 15px; font-size: 14px; }
+.btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.23);
+    filter: brightness(1.1);
+}
+
+.btn-login:hover .btn-icon {
+    transform: translateX(3px);
+}
+
+/* Mensajes de Error */
+.error-msg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 10px;
+    background: var(--error-bg);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 8px;
+    color: var(--error-color);
+    font-size: 0.85rem;
+    font-weight: 500;
+    animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.error-msg svg {
+    width: 16px;
+    height: 16px;
+}
+
+@keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+}

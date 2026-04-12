@@ -1,20 +1,21 @@
 package gittogether.tfg.repositories;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable; // ESTE ES EL IMPORT CRUCIAL
+import gittogether.tfg.entities.Tema;
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-import gittogether.tfg.entities.Tema;
-
-@Repository
 public interface TemaRepository extends JpaRepository<Tema, Integer> {
 
-	boolean existsByTitulo(String titulo);
+	// Usamos @EntityGraph para traer usuario y categoria en una sola consulta
+	// (Instantáneo)
+	// Cambiamos el retorno a Page para que funcione el .getContent() en el Service
+	@EntityGraph(attributePaths = { "usuario", "categoria" })
+	Page<Tema> findAll(Pageable pageable);
 
-	List<Tema> findByTituloContainingIgnoreCase(String titulo);
-
-	// Spring crea el SQL: SELECT * FROM T_TEMA WHERE categoria_id = ?
-	List<Tema> findByCategoriaIdentificador(int categoriaId);
-
+	// También optimizamos la búsqueda por categoría con EntityGraph
+	@EntityGraph(attributePaths = { "usuario", "categoria" })
+	List<Tema> findByCategoriaIdentificador(int identificador);
 }
