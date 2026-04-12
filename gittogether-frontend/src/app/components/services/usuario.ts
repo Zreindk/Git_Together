@@ -30,8 +30,8 @@ export class Usuario {
     return localStorage.getItem('auth_token');
   }
 
-  // Elimina el token para cerrar la sesión del usuario
-  logout(): void {
-    localStorage.removeItem('auth_token');
+  // Borra el token y los datos del usuario para cerrar la sesión
+  logout() {
+    localStorage.clear()
   }
 }

@@ -53,7 +53,6 @@ public class Usuario {
 	@Column(name = "rol", nullable = false)
 	private TipoUsuario rol;
 
-	// Para que React lo lea fácil
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	@Column(name = "fecha_registro", nullable = false)
 	private LocalDate fechaRegistro;

@@ -1,36 +1,19 @@
 <div class="foro-container">
-    <!-- Navbar / Cabecera -->
-    <header class="foro-header">
-        <div class="header-logo">
-            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span class="logo-text">GitTogether</span>
-        </div>
-        <div class="header-user" *ngIf="usuarioLogueado">
-            <span class="user-name">{{ usuarioLogueado.nombre }}</span>
-            <div class="avatar-container">
-                <img [src]="usuarioLogueado.avatar || 'assets/default-avatar.png'" alt="Avatar" class="user-avatar" onerror="this.src='https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff'">
-                <div class="online-indicator"></div>
-            </div>
-        </div>
-    </header>
-
+    
+     <app-navbar></app-navbar>
+    
     <div class="foro-layout">
-        <!-- Sidebar: Categorías -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <h3>Categorías</h3>
             </div>
             <ul class="category-list">
-                <!-- Skeleton Loading para Categorías -->
                 <ng-container *ngIf="cargando">
                     <li class="category-item skeleton-item" *ngFor="let s of skeletonCats">
                         <div class="skeleton-text cat-skel"></div>
                     </li>
                 </ng-container>
 
-                <!-- Categorías Reales -->
                 <ng-container *ngIf="!cargando">
                     <li class="category-item" *ngFor="let cat of categorias">
                         <a href="javascript:void(0)" class="category-link">
@@ -42,7 +25,6 @@
             </ul>
         </aside>
 
-        <!-- Contenido principal -->
         <main class="main-content">
             <div class="content-header">
                 <h2>Descubre debates</h2>
@@ -56,7 +38,6 @@
             </div>
 
             <section class="temas-list">
-                <!-- Skeleton Loading para Temas (Instant feedback) -->
                 <ng-container *ngIf="cargando">
                      <div class="tema-card skeleton-card" *ngFor="let s of skeletonArray">
                          <div class="sk-info">
@@ -70,7 +51,6 @@
                      </div>
                 </ng-container>
 
-                <!-- Lista de Temas Dinámicos -->
                 <ng-container *ngIf="!cargando && temasFiltrados.length > 0">
                     <div class="tema-card" *ngFor="let tema of temasFiltrados">
                         <div class="tema-info">
