@@ -1,46 +1,80 @@
 <div class="login-wrapper">
-    <!-- Efectos de luz de fondo para dar sensación de profundidad (Premium) -->
+    <!-- Efectos de luz de fondo para dar sensación de profundidad -->
     <div class="ambient-glow bg-blur-1"></div>
     <div class="ambient-glow bg-blur-2"></div>
+
+    <!-- Iconos de marca flotantes en los laterales -->
+    <div class="bg-brand-icon icon-1">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1"
+                stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+    </div>
+    <div class="bg-brand-icon icon-2">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1"
+                stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+    </div>
 
     <div class="login-container">
         <div class="login-card">
             <div class="logo-wrapper">
                 <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
             </div>
-            
-            <h2 class="title">GitTogether</h2>
-            <p class="subtitle">Únete a la mejor comunidad de debates</p>
+
+            <h1 class="title">GitTogether</h1>
+            <p class="subtitle">La red social para desarrolladores</p>
 
             <form (submit)="onLogin($event)" class="login-form">
                 <div class="input-group">
-                    <label>Usuario o Email</label>
+                    <label>Usuario o Correo</label>
                     <div class="input-wrapper">
-                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                        <input type="text" name="identificador" [(ngModel)]="loginData.identificador" required placeholder="ejemplo123">
+                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        <input type="text" name="identificador" [(ngModel)]="loginData.identificador" required
+                            placeholder="Introduce tu alias">
                     </div>
                 </div>
 
                 <div class="input-group">
                     <label>Contraseña</label>
                     <div class="input-wrapper">
-                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                        <input type="password" name="password" [(ngModel)]="loginData.password" required placeholder="••••••••">
+                        <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" name="password" [(ngModel)]="loginData.password" required
+                            placeholder="••••••••">
                     </div>
                 </div>
 
-                <button type="submit" class="btn-login">
+                <button type="submit" class="btn-login" [disabled]="!loginData.identificador || !loginData.password">
                     <span>Iniciar sesión</span>
-                    <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </button>
 
+                <!-- Dynamic error message -->
                 <div class="error-msg" *ngIf="errorMessage">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
                     <span>{{ errorMessage }}</span>
                 </div>
             </form>
+
+            <div class="login-footer">
+                <p>¿Problemas para entrar? <a href="javascript:void(0)">Contacta con soporte</a></p>
+            </div>
         </div>
     </div>
 </div>

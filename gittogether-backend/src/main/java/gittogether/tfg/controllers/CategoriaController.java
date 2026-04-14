@@ -15,6 +15,13 @@ public class CategoriaController {
 	@Autowired
 	private CategoriaRepository categoriaRepository;
 
+	// Crear categoria nueva
+		@PostMapping
+		public Categoria crearCategoria(@RequestBody Categoria nuevaCategoria) {
+			// Le decimos al repositorio que guarde el objeto JSON que nos llega en la base de datos
+			return categoriaRepository.save(nuevaCategoria);
+		}
+	
 	// Obtenemos todas las categorías directamente del repositorio
 	@GetMapping
 	public List<Categoria> listar() {

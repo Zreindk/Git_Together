@@ -1,4 +1,17 @@
 <div class="foro-container">
+    <!-- Iconos de marca flotantes en los laterales -->
+    <div class="bg-brand-icon icon-1">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1"
+                stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+    </div>
+    <div class="bg-brand-icon icon-2">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="1"
+                stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+    </div>
 
     <app-navbar></app-navbar>
 
@@ -15,14 +28,18 @@
                 </ng-container>
 
                 <ng-container *ngIf="!cargando">
+                    <li class="category-item">
+                        <a href="javascript:void(0)" class="category-link" [class.active]="!categoriaActiva"
+                            (click)="categoriaActiva = null">
+                            <span class="cat-icon">🌏</span>
+                            <span class="cat-name">Todo el foro</span>
+                        </a>
+                    </li>
                     <li class="category-item" *ngFor="let cat of categorias">
-                        <!-- Enlace de Categoría: Gestiona la navegación y el filtrado al hacer click -->
                         <a href="javascript:void(0)" class="category-link"
                             [class.active]="categoriaActiva?.identificador === cat.identificador"
                             (click)="seleccionarCategoria(cat)">
-                            <!-- Icono Visual: Representación gráfica de la categoría -->
                             <span class="cat-icon">📁</span>
-                            <!-- Nombre de Categoría: Texto descriptivo recuperado del backend -->
                             <span class="cat-name">{{ cat.nombre }}</span>
                         </a>
                     </li>
@@ -31,8 +48,18 @@
         </aside>
 
         <main class="main-content">
+            <!-- Hero Section for a premium feel -->
+            <section class="hero-section">
+                <div class="hero-content">
+                    <span class="hero-badge">Comunidad Git Together</span>
+                    <h1>Explora el conocimiento colectivo.</h1>
+                    <p>Encuentra soluciones, comparte ideas y conecta con otros desarrolladores en nuestra plataforma
+                        dedicada al aprendizaje colaborativo.</p>
+                </div>
+            </section>
+
             <div class="content-header">
-                <h2>Descubre debates</h2>
+                <h2>{{ categoriaActiva ? categoriaActiva.nombre : 'Temas Populares' }}</h2>
                 <div class="search-bar">
                     <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -41,13 +68,14 @@
                         <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                             stroke-linejoin="round" />
                     </svg>
-                    <input type="text" [(ngModel)]="searchQuery" placeholder="Buscar temas">
+                    <input type="text" [(ngModel)]="searchQuery" placeholder="Buscar en el foro...">
                 </div>
             </div>
 
             <section class="temas-list">
                 <ng-container *ngIf="cargando">
                     <div class="tema-card skeleton-card" *ngFor="let s of skeletonArray">
+                        <div class="tema-category-tag" style="background: rgba(255,255,255,0.05)"></div>
                         <div class="sk-info">
                             <div class="skeleton-text sk-title"></div>
                             <div class="skeleton-text sk-meta"></div>
@@ -61,16 +89,15 @@
 
                 <ng-container *ngIf="!cargando && temasFiltrados.length > 0">
                     <div class="tema-card" *ngFor="let tema of temasFiltrados">
+                        <div class="tema-category-tag"></div>
                         <div class="tema-info">
                             <h4 class="tema-title">{{ tema.titulo }}</h4>
                             <div class="tema-meta">
                                 <span class="tema-author-wrapper">
-                                    <img [src]="tema.usuario?.avatar || 'https://ui-avatars.com/api/?name=Author&background=2C323D&color=fff'"
-                                        alt="" class="small-avatar">
                                     <span class="tema-author">{{ tema.usuario?.nombre || 'Usuario' }}</span>
                                 </span>
-                                <span class="tema-date">• {{ tema.fechaCreacion ? (tema.fechaCreacion |
-                                    date:'mediumDate') : 'Reciente' }}</span>
+                                <span class="tema-date">{{ tema.fechaCreacion ? (tema.fechaCreacion |
+                                    date:'mediumDate') : 'Hace un momento' }}</span>
                             </div>
                         </div>
                         <div class="tema-stats">
@@ -81,6 +108,7 @@
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
                                 <span>{{ tema.visitas || 0 }}</span>
+                                <span class="stat-label">Visitas</span>
                             </div>
                             <div class="stat-badge">
                                 <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -88,15 +116,17 @@
                                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                                 </svg>
                                 <span>{{ tema.contadorMensajes || 0 }}</span>
+                                <span class="stat-label">Réplicas</span>
                             </div>
                         </div>
                     </div>
                 </ng-container>
 
                 <div class="empty-state" *ngIf="!cargando && temasFiltrados.length === 0">
-                    <div class="empty-icon">🔍</div>
-                    <h3>No se encontraron temas</h3>
-                    <p>Prueba con otros términos de búsqueda.</p>
+                    <div class="empty-icon">📂</div>
+                    <h3>No encontramos lo que buscas</h3>
+                    <p>Parece que no hay resultados para "{{ searchQuery }}". Intenta con otra palabra clave o explora
+                        las categorías.</p>
                 </div>
             </section>
         </main>

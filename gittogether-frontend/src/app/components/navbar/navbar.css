@@ -1,6 +1,9 @@
 :host {
     display: block;
     width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .navbar-container {
@@ -8,11 +11,13 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    padding: 10px 30px;
-    background-color: #1a1d23;
+    padding: 0 48px;
+    background-color: rgba(13, 17, 23, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     box-sizing: border-box;
-    border-bottom: 1px solid #2d323b;
-    height: 70px;
+    border-bottom: 1px solid #30363d;
+    height: 72px;
 }
 
 .header-logo {
@@ -24,50 +29,37 @@
 .logo-icon {
     width: 28px;
     height: 28px;
-    color: #4dabf7;
+    color: #58a6ff;
 }
 
 .logo-text {
-    font-size: 1.2rem;
-    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
     color: #ffffff;
+    letter-spacing: -0.02em;
 }
 
 .header-user {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 20px;
 }
 
-.btn-header-logout {
-    background: none;
-    border: none;
-    color: #f85149;
+.user-info-section {
     display: flex;
     align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 600;
-    padding: 6px 10px;
-    border-radius: 6px;
-    transition: background-color 0.2s;
-}
-
-.btn-header-logout:hover {
-    background-color: rgba(248, 81, 73, 0.1);
-}
-
-.header-divider {
-    width: 1px;
-    height: 24px;
-    background-color: #30363d;
+    gap: 10px;
+    padding: 6px 14px;
+    background: #1d232c;
+    border: 1px solid #30363d;
+    border-radius: 100px;
 }
 
 .user-name {
-    color: #c9d1d9;
-    font-size: 0.95rem;
-    font-weight: 500;
+    color: #adbac7;
+    font-size: 0.85rem;
+    font-weight: 600;
 }
 
 .avatar-container {
@@ -77,6 +69,56 @@
 }
 
 .user-avatar {
-    width: 35px;
-    height: 35px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #0d1117;
+}
+
+.online-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    background-color: #238636;
+    border: 1.5px solid #0d1117;
+    border-radius: 50%;
+}
+
+.header-divider {
+    width: 1px;
+    height: 20px;
+    background-color: #30363d;
+}
+
+.btn-header-logout {
+    background: rgba(248, 81, 73, 0.1);
+    border: 1px solid rgba(248, 81, 73, 0.2);
+    color: #f85149;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.btn-header-logout:hover {
+    background-color: #f85149;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.logout-icon {
+    width: 18px;
+    height: 18px;
+}
+
+@media (max-width: 768px) {
+    .navbar-container { padding: 0 24px; }
+    .user-name { display: none; }
 }

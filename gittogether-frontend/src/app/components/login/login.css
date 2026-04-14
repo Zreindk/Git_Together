@@ -1,19 +1,21 @@
-/* Variables globales de consistencia (Igual que en Foro) */
+/* Design System - Sophisticated Blue Dark Mode */
 :host {
-    --bg-dark: #0f111a;
-    --bg-surface: #1a1d27;
-    --bg-surface-glass: rgba(26, 29, 39, 0.7);
-    --border-color: #2a2e3d;
-    --text-primary: #e2e8f0;
-    --text-secondary: #94a3b8;
-    --accent-color: #38bdf8;
-    --accent-hover: #0284c7;
-    --accent-glow: rgba(56, 189, 248, 0.4);
-    --gradient-brand: linear-gradient(135deg, #38bdf8, #818cf8);
-    --error-color: #ef4444;
-    --error-bg: rgba(239, 68, 68, 0.1);
-    --radius-lg: 20px;
+    --bg-dark: #0b0e14;
+    --bg-surface: #161b22;
+    --border-color: #30363d;
+
+    --text-primary: #adbac7;
+    --text-secondary: #768390;
+    --text-tertiary: #444c56;
+
+    --accent-color: #58a6ff;
+    --accent-gradient: linear-gradient(135deg, #1f6feb 0%, #58a6ff 100%);
+
+    --error-color: #f85149;
+    --error-bg: rgba(248, 81, 73, 0.1);
+
     --radius-md: 12px;
+    --radius-lg: 20px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -27,99 +29,101 @@
     position: fixed;
     top: 0;
     left: 0;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Inter', sans-serif;
     overflow: hidden;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(31, 111, 235, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 0% 100%, rgba(33, 38, 45, 0.2) 0%, transparent 40%);
 }
 
-/* Efectos de Luz de Fondo Animados */
-.ambient-glow {
+.bg-brand-icon {
     position: absolute;
-    border-radius: 50%;
-    filter: blur(100px);
-    z-index: 0;
-    opacity: 0.5;
-    animation: drift 10s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+    width: 60vh;
+    height: 60vh;
+    opacity: 0.06;
+    pointer-events: none;
+    filter: blur(4px);
+    color: var(--accent-color);
+    z-index: 1;
 }
 
-.bg-blur-1 {
-    width: 400px;
-    height: 400px;
-    background: rgba(56, 189, 248, 0.3);
-    top: -10%;
-    right: -10%;
+.bg-brand-icon svg {
+    width: 100%;
+    height: 100%;
 }
 
-.bg-blur-2 {
-    width: 500px;
-    height: 500px;
-    background: rgba(129, 140, 248, 0.2);
-    bottom: -20%;
-    left: -10%;
-    animation-delay: -5s;
+.icon-1 {
+    top: -10vh;
+    left: -10vh;
+    transform: rotate(-15deg);
 }
 
-@keyframes drift {
-    0% { transform: translateY(0px) scale(1); }
-    100% { transform: translateY(40px) scale(1.1); }
+.icon-2 {
+    bottom: -10vh;
+    right: -10vh;
+    transform: rotate(15deg);
 }
 
-/* Contenedor Principal */
 .login-container {
     position: relative;
     z-index: 10;
     width: 100%;
-    max-width: 420px;
-    padding: 20px;
+    max-width: 440px;
+    padding: 24px;
 }
 
 .login-card {
-    background: var(--bg-surface-glass);
+    background: rgba(22, 27, 34, 0.8);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
-    padding: 48px 40px;
+    padding: 64px 48px;
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 40px 80px -12px rgba(0, 0, 0, 0.5);
     text-align: center;
-    animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes slideUpFade {
-    0% { opacity: 0; transform: translateY(20px); }
-    100% { opacity: 1; transform: translateY(0); }
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-/* Header & Logo */
 .logo-wrapper {
     display: flex;
     justify-content: center;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
 }
 
 .logo-icon {
-    width: 56px;
-    height: 56px;
+    width: 64px;
+    height: 64px;
     color: var(--accent-color);
-    filter: drop-shadow(0 0 12px var(--accent-glow));
+    filter: drop-shadow(0 0 10px rgba(88, 166, 255, 0.3));
 }
 
 .title {
-    margin: 0 0 8px;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    background: var(--gradient-brand);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-family: 'Outfit', sans-serif;
+    margin: 0 0 10px;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.04em;
 }
 
 .subtitle {
-    margin: 0 0 32px;
-    font-size: 0.95rem;
+    margin: 0 0 40px;
+    font-size: 1.1rem;
     color: var(--text-secondary);
 }
 
-/* Formulario & Inputs */
 .login-form {
     display: flex;
     flex-direction: column;
@@ -132,9 +136,11 @@
 
 .input-group label {
     display: block;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
     margin-bottom: 8px;
 }
 
@@ -147,106 +153,91 @@
 .input-icon {
     position: absolute;
     left: 16px;
-    width: 20px;
-    height: 20px;
-    color: var(--text-secondary);
+    width: 18px;
+    height: 18px;
+    color: var(--text-tertiary);
     transition: var(--transition);
 }
 
 .input-wrapper input {
     width: 100%;
-    padding: 14px 16px 14px 44px;
+    padding: 12px 16px 12px 48px;
     background: rgba(0, 0, 0, 0.2);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
-    color: var(--text-primary);
-    font-size: 0.95rem;
+    color: #ffffff;
+    font-size: 1rem;
     transition: var(--transition);
-}
-
-.input-wrapper input::placeholder {
-    color: #475569;
 }
 
 .input-wrapper input:focus {
     outline: none;
     border-color: var(--accent-color);
-    background: rgba(0, 0, 0, 0.4);
-    box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
 }
 
-.input-wrapper input:focus + .input-icon,
-.input-wrapper input:not(:placeholder-shown) + .input-icon {
-    /* Mueve la logica de svg a enfrente desde el HTML si requieres cambiar el color en focus,
-       pero con selectores adyacentes el icono debe estar despues del input en el DOM. 
-       Alternativamente, el contenedor .input-wrapper:focus-within .input-icon se encarga */
-}
-
-.input-wrapper:focus-within .input-icon {
-    color: var(--accent-color);
-}
-
-/* Botón Iniciar Sesión */
 .btn-login {
-    display: flex;
+    display: inline-flex;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    padding: 12px;
+    margin: 12px;
     width: 100%;
-    padding: 14px;
-    margin-top: 8px;
-    background: var(--gradient-brand);
-    color: white;
+    align-self: center;
+    background: var(--accent-gradient);
+    color: #ffffff;
     border: none;
     border-radius: var(--radius-md);
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 0.95rem;
+    font-weight: 200;
     cursor: pointer;
     transition: var(--transition);
-    box-shadow: 0 4px 14px 0 rgba(56, 189, 248, 0.39);
-}
-
-.btn-icon {
-    width: 18px;
-    height: 18px;
-    transition: transform 0.2s;
+    box-shadow: 0 4px 12px rgba(88, 166, 255, 0.2);
 }
 
 .btn-login:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(56, 189, 248, 0.23);
-    filter: brightness(1.1);
+    box-shadow: 0 8px 20px rgba(88, 166, 255, 0.3);
 }
 
-.btn-login:hover .btn-icon {
-    transform: translateX(3px);
-}
-
-/* Mensajes de Error */
+/* More Professional Error Message */
 .error-msg {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-top: 16px;
-    padding: 10px;
-    background: var(--error-bg);
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    border-radius: 8px;
     color: var(--error-color);
+    padding: 12px;
     font-size: 0.85rem;
-    font-weight: 500;
-    animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    font-weight: 600;
+    border-top: 1px solid rgba(248, 81, 73, 0.1);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .error-msg svg {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
 }
 
-@keyframes shake {
-    10%, 90% { transform: translate3d(-1px, 0, 0); }
-    20%, 80% { transform: translate3d(2px, 0, 0); }
-    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-    40%, 60% { transform: translate3d(4px, 0, 0); }
+.login-footer {
+    margin-top: 32px;
+    font-size: 0.9rem;
+    color: var(--text-tertiary);
+}
+
+.login-footer a {
+    color: var(--accent-color);
+    text-decoration: none;
 }
