@@ -1,5 +1,7 @@
 package gittogether.tfg.controllers;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import gittogether.tfg.entities.LoginRequest;
 import gittogether.tfg.entities.LoginResponse;
 import gittogether.tfg.entities.Usuario;
+import gittogether.tfg.entities.enums.TipoUsuario;
 import gittogether.tfg.services.UsuarioService;
 import gittogether.tfg.util.JwtUtil;
 
@@ -29,14 +32,14 @@ public class UsuarioController {
 	
 	
 
-	@PostMapping("/registrar")
+	@PostMapping("/register")
 	public ResponseEntity<?> registrar(@RequestBody Usuario usuario) {
-		try {
-			Usuario nuevoUsuario = usuarioService.registrarUsuario(usuario);
-			return ResponseEntity.ok(nuevoUsuario);
-		} catch (RuntimeException e) {
-			return ResponseEntity.badRequest().body(e.getMessage());
-		}
+	    try {
+	        Usuario nuevoUsuario = usuarioService.registrarUsuario(usuario);
+	        return ResponseEntity.ok(nuevoUsuario);
+	    } catch (RuntimeException e) {
+	        return ResponseEntity.badRequest().body(e.getMessage());
+	    }
 	}
 
 	// GET: http://localhost:8080/api/usuarios

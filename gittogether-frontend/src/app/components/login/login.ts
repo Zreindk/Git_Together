@@ -45,4 +45,9 @@ export class Login {
       }
     });
   }
+
+  // Navegar a la página de registro
+  goToRegister() {
+    this.router.navigate(['/register']);
+  }
 }

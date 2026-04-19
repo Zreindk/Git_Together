@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import gittogether.tfg.entities.Usuario;
+import gittogether.tfg.entities.enums.TipoUsuario;
 import gittogether.tfg.repositories.UsuarioRepository;
 
 @Service
@@ -34,6 +35,7 @@ public class UsuarioService {
 			throw new RuntimeException("El nombre de usuario ya existe");
 		}
 		usuario.setFechaRegistro(LocalDate.now());
+		usuario.setRol(TipoUsuario.Usuario);
 		return usuarioRepository.save(usuario);
 	}
 

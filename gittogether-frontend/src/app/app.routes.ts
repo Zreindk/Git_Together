@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { Login } from './components/login/login';
+import { Register } from './components/register/register';
 import { Foro } from './components/foro/foro';
 import { ForoTema } from './components/foro-tema/foro-tema';
 import { authGuard } from './components/services/auth.guard'; // Importamos el guardián de rutas
@@ -10,6 +11,9 @@ export const routes: Routes = [
 
   // Ruta pública para el inicio de sesión
   { path: 'login', component: Login },
+
+  // Ruta pública para el registro
+  { path: 'register', component: Register },
 
   // Ruta protegida: solo los usuarios con token pueden acceder al foro
   {

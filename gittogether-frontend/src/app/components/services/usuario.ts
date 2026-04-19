@@ -25,6 +25,11 @@ export class Usuario {
     );
   }
 
+  // Realiza la petición de registro
+  register(datos: any): Observable<any> {
+    return this.http.post<any>(`${this.API_URL}/register`, datos);
+  }
+
   // Recupera el token guardado para enviarlo en las cabeceras HTTP
   getToken(): string | null {
     return localStorage.getItem('auth_token');
