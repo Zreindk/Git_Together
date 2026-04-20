@@ -33,6 +33,9 @@
                 <div class="tema-detail-card skeleton-card" *ngIf="cargando && !tema">
                     <div class="skeleton-text sk-category"></div>
                     <div class="skeleton-text sk-title"></div>
+                    <div class="skeleton-text sk-body"></div>
+                    <div class="skeleton-text sk-body" style="width: 90%;"></div>
+                    <div class="skeleton-text sk-body" style="width: 80%;"></div>
                 </div>
 
                 <!-- Cabecera del Tema -->
@@ -63,6 +66,11 @@
                                 <span class="tema-full-date">Publicado el {{ tema.fechaCreacion | date:'fullDate'
                                     }}</span>
                             </div>
+                        </div>
+
+                        <!-- Descripción del Tema -->
+                        <div class="tema-body-content" *ngIf="tema.descripcion">
+                            {{ tema.descripcion }}
                         </div>
                     </div>
                 </article>
@@ -163,9 +171,11 @@
                             <h3>Añadir un comentario</h3>
                         </div>
                         <div class="reply-body">
-                            <textarea [(ngModel)]="nuevoComentario" placeholder="Escribe tu respuesta aquí..." rows="4" class="reply-textarea"></textarea>
+                            <textarea [(ngModel)]="nuevoComentario" placeholder="Escribe tu respuesta aquí..." rows="4"
+                                class="reply-textarea"></textarea>
                             <div class="reply-actions">
-                                <button class="btn-submit-comment" (click)="comentar()" [disabled]="!nuevoComentario.trim()">
+                                <button class="btn-submit-comment" (click)="comentar()"
+                                    [disabled]="!nuevoComentario.trim()">
                                     Publicar comentario
                                 </button>
                             </div>

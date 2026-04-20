@@ -37,7 +37,8 @@ export class Usuario {
 
   // Elimina el caché del navegador
   logout() {
-    localStorage.clear()
+    localStorage.clear();
+    sessionStorage.clear();
   }
 
   // Obtiene el usuario actualmente logueado desde localStorage

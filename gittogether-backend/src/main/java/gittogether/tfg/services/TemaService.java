@@ -59,21 +59,28 @@ public class TemaService {
     }
 
     public Optional<Tema> obtenerTemaPorSlug(String slug) {
-        return temaRepository.findBySlug(slug);
+        Optional<Tema> temaOpt = temaRepository.findBySlug(slug);
+        temaOpt.ifPresent(tema -> {
+            tema.setVisitas(tema.getVisitas() + 1);
+            temaRepository.save(tema);
+        });
+        return temaOpt;
     }
-    
-	public void eliminarTema(Integer id) {
-		if (!temaRepository.existsById(id)) {
-			throw new RuntimeException("El tema no existe");
-		}
-		temaRepository.deleteById(id);
-	}
 
-	public Tema editarTema(Integer id, String nuevoTitulo) {
-		Tema tema = temaRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("El tema no existe"));
-		
-		tema.setTitulo(nuevoTitulo);
-		return temaRepository.save(tema);
-	}
+    public void eliminarTema(Integer id) {
+        if (!temaRepository.existsById(id)) {
+            throw new RuntimeException("El tema no existe");
+        }
+        temaRepository.deleteById(id);
+    }
+
+    public Tema editarTema(Integer id, String nuevoTitulo, String nuevaDescripcion) {
+        Tema tema = temaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("El tema no existe"));
+
+        if (nuevoTitulo != null) tema.setTitulo(nuevoTitulo);
+        if (nuevaDescripcion != null) tema.setDescripcion(nuevaDescripcion);
+        
+        return temaRepository.save(tema);
+    }
 }

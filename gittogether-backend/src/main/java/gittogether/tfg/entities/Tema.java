@@ -30,6 +30,9 @@ public class Tema {
 	@Column(name = "titulo", length = 255, nullable = false)
 	private String titulo;
 
+	@Column(name = "descripcion", columnDefinition = "TEXT")
+	private String descripcion;
+
 	@Column(name = "slug", length = 255, nullable = false)
 	private String slug;
 
@@ -67,6 +70,14 @@ public class Tema {
 
 	public void setTitulo(String titulo) {
 		this.titulo = titulo;
+	}
+
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
 	}
 
 	public String getSlug() {
@@ -127,9 +138,9 @@ public class Tema {
 
 	@Override
 	public String toString() {
-		return "Tema [identificador=" + identificador + ", titulo=" + titulo + ", slug=" + slug + ", visitas=" + visitas
-				+ ", contadorMensajes=" + contadorMensajes + ", abierto=" + abierto + ", fechaCreacion=" + fechaCreacion
-				+ ", categoria=" + categoria + ", usuario=" + usuario + "]";
+		return "Tema [identificador=" + identificador + ", titulo=" + titulo + ", descripcion=" + descripcion
+				+ ", slug=" + slug + ", visitas=" + visitas + ", contadorMensajes=" + contadorMensajes + ", abierto="
+				+ abierto + ", fechaCreacion=" + fechaCreacion + ", categoria=" + categoria + ", usuario=" + usuario + "]";
 	}
 
 }

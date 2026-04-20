@@ -73,8 +73,8 @@ export class ForoService {
         return this.http.delete(`${this.API_TEMAS}/${id}`);
     }
 
-    editTema(id: number, titulo: string): Observable<any> {
-        return this.http.put(`${this.API_TEMAS}/${id}`, { titulo });
+    editTema(id: number, titulo?: string, descripcion?: string): Observable<any> {
+        return this.http.put(`${this.API_TEMAS}/${id}`, { titulo, descripcion });
     }
 
     createTema(tema: any): Observable<any> {

@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ForoService } from '../services/foro.service';
@@ -16,6 +16,9 @@ import { NavbarComponent } from '../navbar/navbar';
   styleUrl: './foro.css'
 })
 export class Foro implements OnInit {
+  @ViewChild('mainContent') mainContent!: ElementRef;
+  private scrollRestaurado = false;
+
   // Lista de Temas y Categorias: Almacena todos los temas y categorias obtenidos del backend o del caché
   temas: any[] = [];
   categorias: any[] = [];
@@ -42,8 +45,8 @@ export class Foro implements OnInit {
   // Método de Carga: Gestiona la obtención de temas y categorías mediante el patrón SWR
   cargarDatosIniciales() {
     // Caché de Temas y Categorias: Intentamos recuperar los datos guardados localmente
-    const cachedTemas = localStorage.getItem('foro_temas_cache');
-    const cachedCats = localStorage.getItem('foro_categorias_cache');
+    const cachedTemas = sessionStorage.getItem('foro_temas_cache');
+    const cachedCats = sessionStorage.getItem('foro_categorias_cache');
 
     // Validación de Caché: Si hay datos guardados, los mostramos inmediatamente para evitar esperas
     if (cachedTemas && cachedCats) {
@@ -51,6 +54,7 @@ export class Foro implements OnInit {
       this.categorias = JSON.parse(cachedCats);
       // Feedback Instantáneo: Desactivamos el estado de carga porque ya tenemos datos que mostrar
       this.cargando = false;
+      this.restaurarScroll();
     } else {
       // Estado Inicial: Si no hay caché, activamos los componentes de carga (skeletons) hasta que llegen los datos
       this.cargando = true;
@@ -68,13 +72,14 @@ export class Foro implements OnInit {
         this.temas = res.temas;
 
         // Actualización Local de Temas y Categorías: Guardamos las nuevos temas y categorias en el caché local
-        localStorage.setItem('foro_categorias_cache', JSON.stringify(res.categorias));
-        localStorage.setItem('foro_temas_cache', JSON.stringify(res.temas));
+        sessionStorage.setItem('foro_categorias_cache', JSON.stringify(res.categorias));
+        sessionStorage.setItem('foro_temas_cache', JSON.stringify(res.temas));
 
         // Finalización de Carga: Indicamos que ya no estamos esperando datos
         this.cargando = false;
         // Sincronización de Vista: Forzamos a Angular a detectar los cambios para actualizar el HTML inmediatamente
         this.cdr.detectChanges();
+        this.restaurarScroll();
       },
       // Gestión de Errores: Manejamos posibles fallos en la comunicación con el servidor
       error: (err) => {
@@ -126,8 +131,35 @@ export class Foro implements OnInit {
   // Navegación: Redirige al usuario a la página de detalle del tema seleccionado
   verTema(tema: any) {
     if (tema && tema.slug) {
+      if (this.mainContent) {
+        sessionStorage.setItem('foroScrollPosition', this.mainContent.nativeElement.scrollTop.toString());
+      }
       this.router.navigate(['/foro/tema', tema.slug]);
     }
+  }
+
+  // Restaura el scroll guardado previamente al volver desde un tema
+  restaurarScroll() {
+    if (this.scrollRestaurado) return;
+    
+    setTimeout(() => {
+      if (this.mainContent) {
+        const scroll = sessionStorage.getItem('foroScrollPosition');
+        if (scroll) {
+          // Desactivamos momentáneamente el scroll suave para que sea instantáneo
+          this.mainContent.nativeElement.style.scrollBehavior = 'auto';
+          this.mainContent.nativeElement.scrollTop = parseInt(scroll, 10);
+          
+          // Y luego volvemos a dejar el valor por defecto en css
+          setTimeout(() => {
+            if (this.mainContent) {
+              this.mainContent.nativeElement.style.scrollBehavior = '';
+            }
+          }, 50);
+        }
+        this.scrollRestaurado = true;
+      }
+    }, 10); // Un pequeño margen para que Angular termine de renderizar el *ngFor
   }
 
   // --- PERMISOS ---
@@ -171,24 +203,28 @@ export class Foro implements OnInit {
     event.stopPropagation(); // Evitar que el clic abra el tema
     const nuevoTitulo = window.prompt("Editar título del tema:", tema.titulo);
     if (nuevoTitulo !== null && nuevoTitulo.trim() !== "") {
-      const id = tema.identificador || tema.id;
-      console.log("Enviando petición PUT para Tema ID:", id, "con título:", nuevoTitulo);
+      const nuevaDescripcion = window.prompt("Editar descripción del tema:", tema.descripcion || '');
+      if (nuevaDescripcion !== null) {
+        const id = tema.identificador || tema.id;
+        console.log("Enviando petición PUT para Tema ID:", id, "con título:", nuevoTitulo, "y descripción:", nuevaDescripcion);
 
-      this.foroService.editTema(id, nuevoTitulo).subscribe({
-        next: (res) => {
-          console.log("Respuesta del servidor al editar tema:", res);
-          tema.titulo = nuevoTitulo;
-          this.foroService.clearCache();
-          this.toastService.success("Tema actualizado correctamente");
-          // Removemos la cache individual de este tema por si entra
-          localStorage.removeItem(`tema_slug_${tema.slug}_cache`);
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error("Error al editar el tema", err);
-          this.toastService.error("Error al editar el tema.");
-        }
-      });
+        this.foroService.editTema(id, nuevoTitulo, nuevaDescripcion).subscribe({
+          next: (res) => {
+            console.log("Respuesta del servidor al editar tema:", res);
+            tema.titulo = nuevoTitulo;
+            tema.descripcion = nuevaDescripcion;
+            this.foroService.clearCache();
+            this.toastService.success("Tema actualizado correctamente");
+            // Removemos la cache individual de este tema por si entra
+            sessionStorage.removeItem(`tema_slug_${tema.slug}_cache`);
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            console.error("Error al editar el tema", err);
+            this.toastService.error("Error al editar el tema.");
+          }
+        });
+      }
     }
   }
 
@@ -252,27 +288,31 @@ export class Foro implements OnInit {
 
     const titulo = window.prompt(`Crear nuevo tema en "${this.categoriaActiva.nombre}":\n\nIntroduce el título:`);
     if (titulo !== null && titulo.trim() !== "") {
-      const nuevoTema = {
-        titulo: titulo.trim(),
-        slug: this.generarSlug(titulo.trim()),
-        categoria: { identificador: this.categoriaActiva.identificador || this.categoriaActiva.id },
-        usuario: { identificador: usuarioActual.identificador || usuarioActual.id }
-      };
+      const descripcion = window.prompt("Introduce la descripción para el tema:");
+      if (descripcion !== null) {
+        const nuevoTema = {
+          titulo: titulo.trim(),
+          descripcion: descripcion.trim(),
+          slug: this.generarSlug(titulo.trim()),
+          categoria: { identificador: this.categoriaActiva.identificador || this.categoriaActiva.id },
+          usuario: { identificador: usuarioActual.identificador || usuarioActual.id }
+        };
 
-      console.log("Creando tema:", nuevoTema);
-      this.foroService.createTema(nuevoTema).subscribe({
-        next: (res) => {
-          console.log("Tema creado:", res);
-          this.toastService.success("¡Tema creado con éxito!");
-          // Refrescar lista
-          this.foroService.clearCache();
-          this.cargarDatosIniciales();
-        },
-        error: (err) => {
-          console.error("Error al crear el tema", err);
-          this.toastService.error("Error al crear el tema.");
-        }
-      });
+        console.log("Creando tema:", nuevoTema);
+        this.foroService.createTema(nuevoTema).subscribe({
+          next: (res) => {
+            console.log("Tema creado:", res);
+            this.toastService.success("¡Tema creado con éxito!");
+            // Refrescar lista
+            this.foroService.clearCache();
+            this.cargarDatosIniciales();
+          },
+          error: (err) => {
+            console.error("Error al crear el tema", err);
+            this.toastService.error("Error al crear el tema.");
+          }
+        });
+      }
     }
   }
 

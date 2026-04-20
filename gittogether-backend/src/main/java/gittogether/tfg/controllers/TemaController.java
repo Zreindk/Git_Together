@@ -20,7 +20,8 @@ import gittogether.tfg.services.TemaService;
 
 @RestController
 @RequestMapping("/api/temas")
-@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(origins = "*", methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT,
+		RequestMethod.DELETE })
 public class TemaController {
 
 	@Autowired
@@ -54,7 +55,7 @@ public class TemaController {
 	public Tema crear(@RequestBody Tema tema) {
 		return temaService.crearTema(tema);
 	}
-	
+
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> eliminarTema(@PathVariable Integer id) {
 		try {
@@ -69,7 +70,8 @@ public class TemaController {
 	public ResponseEntity<?> editarTema(@PathVariable Integer id, @RequestBody java.util.Map<String, String> payload) {
 		try {
 			String nuevoTitulo = payload.get("titulo");
-			Tema temaActualizado = temaService.editarTema(id, nuevoTitulo);
+			String nuevaDescripcion = payload.get("descripcion");
+			Tema temaActualizado = temaService.editarTema(id, nuevoTitulo, nuevaDescripcion);
 			return ResponseEntity.ok(temaActualizado);
 		} catch (RuntimeException e) {
 			return ResponseEntity.badRequest().body("Error al editar el tema: " + e.getMessage());

@@ -23,9 +23,6 @@ public class Categoria {
 	@Column(name = "nombre", length = 255, nullable = false, unique = true)
 	private String nombre;
 
-	@Column(name = "descripcion", length = 255, nullable = false)
-	private String descripcion;
-
 	@Column(name = "slug", length = 255, nullable = false, unique = true)
 	private String slug;
 
@@ -48,14 +45,6 @@ public class Categoria {
 		this.nombre = nombre;
 	}
 
-	public String getDescripcion() {
-		return descripcion;
-	}
-
-	public void setDescripcion(String descripcion) {
-		this.descripcion = descripcion;
-	}
-
 	public String getSlug() {
 		return slug;
 	}
@@ -74,8 +63,8 @@ public class Categoria {
 
 	@Override
 	public String toString() {
-		return "Categoria [identificador=" + identificador + ", nombre=" + nombre + ", descripcion=" + descripcion
-				+ ", slug=" + slug + ", ordenVisual=" + ordenVisual + "]";
+		return "Categoria [identificador=" + identificador + ", nombre=" + nombre + ", slug=" + slug + ", ordenVisual="
+				+ ordenVisual + "]";
 	}
 
 }

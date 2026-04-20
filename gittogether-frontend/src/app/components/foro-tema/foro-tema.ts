@@ -30,7 +30,7 @@ export class ForoTema implements OnInit {
     private cdr: ChangeDetectorRef,
     public usuarioService: Usuario, // Inyectar Usuario service (Público para el HTML)
     private toastService: ToastService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.temaSlug = this.route.snapshot.paramMap.get('slug');
@@ -49,7 +49,7 @@ export class ForoTema implements OnInit {
 
     // SWR Pattern: Intentar cargar del caché primero para carga instantánea
     const cacheKey = `tema_slug_${this.temaSlug}_cache`;
-    const cachedData = localStorage.getItem(cacheKey);
+    const cachedData = sessionStorage.getItem(cacheKey);
 
     if (cachedData) {
       const parsed = JSON.parse(cachedData);
@@ -73,13 +73,13 @@ export class ForoTema implements OnInit {
     ).subscribe({
       next: (mensajesRes) => {
         this.mensajes = mensajesRes;
-        
+
         // Guardar en caché para la próxima vez
-        localStorage.setItem(cacheKey, JSON.stringify({
+        sessionStorage.setItem(cacheKey, JSON.stringify({
           tema: this.tema,
           mensajes: this.mensajes
         }));
-        
+
         this.cargando = false;
         this.cdr.detectChanges();
       },
@@ -134,7 +134,7 @@ export class ForoTema implements OnInit {
           this.toastService.success("Tema eliminado correctamente");
           this.foroService.clearCache();
           const cacheKey = `tema_slug_${this.temaSlug}_cache`;
-          localStorage.removeItem(cacheKey); // Limpiamos la cache del tema eliminado
+          sessionStorage.removeItem(cacheKey); // Limpiamos la cache del tema eliminado
           this.volver();
         },
         error: (err) => {
@@ -149,30 +149,34 @@ export class ForoTema implements OnInit {
     if (!this.tema) return;
     const nuevoTitulo = window.prompt("Editar título del tema:", this.tema.titulo);
     if (nuevoTitulo !== null && nuevoTitulo.trim() !== "") {
-      const id = this.tema.identificador || this.tema.id;
-      console.log("Enviando petición PUT para Tema ID:", id, "con título:", nuevoTitulo);
-      
-      this.foroService.editTema(id, nuevoTitulo).subscribe({
-        next: (res) => {
-          console.log("Respuesta del servidor al editar tema:", res);
-          this.tema.titulo = nuevoTitulo;
-          this.toastService.success("Título del tema actualizado");
-          this.foroService.clearCache();
-          
-          // Actualizamos la memoria del navegador
-          const cacheKey = `tema_slug_${this.temaSlug}_cache`;
-          localStorage.setItem(cacheKey, JSON.stringify({
-            tema: this.tema,
-            mensajes: this.mensajes
-          }));
-          
-          this.cdr.detectChanges();
-        },
-        error: (err) => {
-          console.error("Error al editar el tema", err);
-          this.toastService.error("Error al editar el tema.");
-        }
-      });
+      const nuevaDescripcion = window.prompt("Editar descripción del tema:", this.tema.descripcion || '');
+      if (nuevaDescripcion !== null) {
+        const id = this.tema.identificador || this.tema.id;
+        console.log("Enviando petición PUT para Tema ID:", id, "con título:", nuevoTitulo, "y descripción:", nuevaDescripcion);
+
+        this.foroService.editTema(id, nuevoTitulo, nuevaDescripcion).subscribe({
+          next: (res) => {
+            console.log("Respuesta del servidor al editar tema:", res);
+            this.tema.titulo = nuevoTitulo;
+            this.tema.descripcion = nuevaDescripcion;
+            this.toastService.success("Tema actualizado correctamente");
+            this.foroService.clearCache();
+
+            // Actualizamos la memoria del navegador
+            const cacheKey = `tema_slug_${this.temaSlug}_cache`;
+            sessionStorage.setItem(cacheKey, JSON.stringify({
+              tema: this.tema,
+              mensajes: this.mensajes
+            }));
+
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            console.error("Error al editar el tema", err);
+            this.toastService.error("Error al editar el tema.");
+          }
+        });
+      }
     }
   }
 
@@ -184,14 +188,17 @@ export class ForoTema implements OnInit {
       this.foroService.deleteMensaje(id).subscribe({
         next: () => {
           this.mensajes = this.mensajes.filter(m => (m.identificador || m.id) !== id);
-          
+          if (this.tema && this.tema.contadorMensajes > 0) {
+            this.tema.contadorMensajes--;
+          }
+
           // Actualizamos la memoria del navegador
           const cacheKey = `tema_slug_${this.temaSlug}_cache`;
-          localStorage.setItem(cacheKey, JSON.stringify({
+          sessionStorage.setItem(cacheKey, JSON.stringify({
             tema: this.tema,
             mensajes: this.mensajes
           }));
-          
+
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -227,14 +234,14 @@ export class ForoTema implements OnInit {
         mensaje.contenido = this.mensajeEditandoTexto;
         this.toastService.success("Mensaje editado");
         this.cancelarEdicion();
-        
+
         // Actualizamos la memoria del navegador
         const cacheKey = `tema_slug_${this.temaSlug}_cache`;
-        localStorage.setItem(cacheKey, JSON.stringify({
+        sessionStorage.setItem(cacheKey, JSON.stringify({
           tema: this.tema,
           mensajes: this.mensajes
         }));
-        
+
         this.cdr.detectChanges();
       },
       error: (err) => {
@@ -269,17 +276,20 @@ export class ForoTema implements OnInit {
         this.toastService.success("¡Mensaje enviado!");
         // Añadir el nuevo mensaje a la lista local
         this.mensajes.push(res);
+        if (this.tema) {
+          this.tema.contadorMensajes = (this.tema.contadorMensajes || 0) + 1;
+        }
         this.nuevoComentario = '';
-        
+
         // Actualizar caché
         const cacheKey = `tema_slug_${this.temaSlug}_cache`;
-        localStorage.setItem(cacheKey, JSON.stringify({
+        sessionStorage.setItem(cacheKey, JSON.stringify({
           tema: this.tema,
           mensajes: this.mensajes
         }));
-        
+
         this.cdr.detectChanges();
-        
+
         // Hacer scroll al final para ver el nuevo comentario
         setTimeout(() => {
           window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
