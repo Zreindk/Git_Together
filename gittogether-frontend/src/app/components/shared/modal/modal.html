@@ -1,0 +1,41 @@
+<div class="modal-overlay" *ngIf="config" (mousedown)="onMouseDown($event)" (mouseup)="onMouseUp($event)">
+  <div class="modal-container">
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>{{ config.title }}</h2>
+      <p *ngIf="config.message">{{ config.message }}</p>
+    </div>
+
+    <!-- Dynamic Form Inputs -->
+    <div class="modal-form" *ngIf="config.type === 'form' && config.inputs">
+      <div class="input-group" *ngFor="let input of config.inputs">
+        <label [for]="input.name">{{ input.label }}</label>
+        
+        <input *ngIf="input.type === 'text'" 
+               [type]="input.type" 
+               [id]="input.name" 
+               [(ngModel)]="input.value" 
+               [placeholder]="input.placeholder || ''"
+               (keyup.enter)="onConfirm()">
+
+        <textarea *ngIf="input.type === 'textarea'" 
+                  [id]="input.name" 
+                  [(ngModel)]="input.value" 
+                  [placeholder]="input.placeholder || ''"></textarea>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="modal-footer">
+      <button class="btn btn-cancel" (click)="onCancel()">
+        {{ config.cancelText || 'Cancelar' }}
+      </button>
+      <button class="btn" 
+              [class.btn-confirm]="config.type !== 'danger'"
+              [class.btn-danger]="config.type === 'danger'"
+              (click)="onConfirm()">
+        {{ config.confirmText || 'Confirmar' }}
+      </button>
+    </div>
+  </div>
+</div>

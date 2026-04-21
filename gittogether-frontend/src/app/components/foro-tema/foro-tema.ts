@@ -6,6 +6,8 @@ import { ForoService } from '../services/foro.service';
 import { Usuario } from '../services/usuario';
 import { NavbarComponent } from '../navbar/navbar';
 import { ToastService } from '../../services/toast.service';
+import { ModalService } from '../../services/modal.service';
+
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 
@@ -29,8 +31,10 @@ export class ForoTema implements OnInit {
     private foroService: ForoService,
     private cdr: ChangeDetectorRef,
     public usuarioService: Usuario, // Inyectar Usuario service (Público para el HTML)
-    private toastService: ToastService
+    private toastService: ToastService,
+    private modalService: ModalService
   ) { }
+
 
   ngOnInit(): void {
     this.temaSlug = this.route.snapshot.paramMap.get('slug');
@@ -124,9 +128,13 @@ export class ForoTema implements OnInit {
   }
 
   // --- ACCIONES TEMA ---
-  borrarTema() {
+  async borrarTema() {
     if (!this.tema) return;
-    const confirmacion = window.confirm("¿Estás seguro de que deseas eliminar este tema? Esta acción no se puede deshacer.");
+    const confirmacion = await this.modalService.confirm(
+      "Eliminar Tema",
+      "¿Estás seguro de que deseas eliminar este tema? Esta acción no se puede deshacer.",
+      true
+    );
     if (confirmacion) {
       const id = this.tema.identificador || this.tema.id;
       this.foroService.deleteTema(id).subscribe({
@@ -145,44 +153,46 @@ export class ForoTema implements OnInit {
     }
   }
 
-  editarTema() {
+  async editarTema() {
     if (!this.tema) return;
-    const nuevoTitulo = window.prompt("Editar título del tema:", this.tema.titulo);
-    if (nuevoTitulo !== null && nuevoTitulo.trim() !== "") {
-      const nuevaDescripcion = window.prompt("Editar descripción del tema:", this.tema.descripcion || '');
-      if (nuevaDescripcion !== null) {
-        const id = this.tema.identificador || this.tema.id;
-        console.log("Enviando petición PUT para Tema ID:", id, "con título:", nuevoTitulo, "y descripción:", nuevaDescripcion);
+    const data = await this.modalService.prompt("Editar Tema", [
+      { name: 'titulo', label: 'Título del Tema', type: 'text', value: this.tema.titulo },
+      { name: 'descripcion', label: 'Descripción', type: 'textarea', value: this.tema.descripcion || '' }
+    ]);
 
-        this.foroService.editTema(id, nuevoTitulo, nuevaDescripcion).subscribe({
-          next: (res) => {
-            console.log("Respuesta del servidor al editar tema:", res);
-            this.tema.titulo = nuevoTitulo;
-            this.tema.descripcion = nuevaDescripcion;
-            this.toastService.success("Tema actualizado correctamente");
-            this.foroService.clearCache();
+    if (data && data.titulo?.trim()) {
+      const id = this.tema.identificador || this.tema.id;
+      this.foroService.editTema(id, data.titulo, data.descripcion).subscribe({
+        next: (res) => {
+          this.tema.titulo = data.titulo;
+          this.tema.descripcion = data.descripcion;
+          this.toastService.success("Tema actualizado correctamente");
+          this.foroService.clearCache();
 
-            // Actualizamos la memoria del navegador
-            const cacheKey = `tema_slug_${this.temaSlug}_cache`;
-            sessionStorage.setItem(cacheKey, JSON.stringify({
-              tema: this.tema,
-              mensajes: this.mensajes
-            }));
+          // Actualizamos la memoria del navegador
+          const cacheKey = `tema_slug_${this.temaSlug}_cache`;
+          sessionStorage.setItem(cacheKey, JSON.stringify({
+            tema: this.tema,
+            mensajes: this.mensajes
+          }));
 
-            this.cdr.detectChanges();
-          },
-          error: (err) => {
-            console.error("Error al editar el tema", err);
-            this.toastService.error("Error al editar el tema.");
-          }
-        });
-      }
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error("Error al editar el tema", err);
+          this.toastService.error("Error al editar el tema.");
+        }
+      });
     }
   }
 
   // --- ACCIONES MENSAJES ---
-  borrarMensaje(mensaje: any) {
-    const confirmacion = window.confirm("¿Estás seguro de que deseas eliminar este mensaje?");
+  async borrarMensaje(mensaje: any) {
+    const confirmacion = await this.modalService.confirm(
+      "Eliminar Mensaje",
+      "¿Estás seguro de que deseas eliminar este mensaje? No podrás recuperarlo.",
+      true
+    );
     if (confirmacion) {
       const id = mensaje.identificador || mensaje.id;
       this.foroService.deleteMensaje(id).subscribe({

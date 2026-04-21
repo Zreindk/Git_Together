@@ -5,6 +5,8 @@ import { ForoService } from '../services/foro.service';
 import { Usuario } from '../services/usuario';
 import { Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
+import { ModalService } from '../../services/modal.service';
+
 import { forkJoin } from 'rxjs';
 import { NavbarComponent } from '../navbar/navbar';
 
@@ -35,7 +37,8 @@ export class Foro implements OnInit {
 
   // Inyección de Dependencias: Inicializamos los servicios necesarios para el funcionamiento del componente
   /*private cdr: ChangeDetectorRef -> Dependencia para que Angular actualice la vista sin necesidad de interaccion del usuario al detectar cambios en los datos*/
-  constructor(private foroService: ForoService, private router: Router, private cdr: ChangeDetectorRef, public usuarioService: Usuario, private toastService: ToastService) { }
+  constructor(private foroService: ForoService, private router: Router, private cdr: ChangeDetectorRef, public usuarioService: Usuario, private toastService: ToastService, private modalService: ModalService) { }
+
 
   // Ciclo de Vida OnInit: Punto de entrada principal al renderizar el componente
   ngOnInit(): void {
@@ -180,9 +183,13 @@ export class Foro implements OnInit {
   }
 
   // --- ACCIONES TEMA ---
-  borrarTema(tema: any, event: Event) {
+  async borrarTema(tema: any, event: Event) {
     event.stopPropagation(); // Evitar que el clic abra el tema
-    const confirmacion = window.confirm("¿Estás seguro de que deseas eliminar este tema?");
+    const confirmacion = await this.modalService.confirm(
+      "Eliminar Tema",
+      "¿Estás seguro de que deseas eliminar este tema? Esta acción no se puede deshacer.",
+      true
+    );
     if (confirmacion) {
       const id = tema.identificador || tema.id;
       this.foroService.deleteTema(id).subscribe({
@@ -199,39 +206,40 @@ export class Foro implements OnInit {
     }
   }
 
-  editarTema(tema: any, event: Event) {
+  async editarTema(tema: any, event: Event) {
     event.stopPropagation(); // Evitar que el clic abra el tema
-    const nuevoTitulo = window.prompt("Editar título del tema:", tema.titulo);
-    if (nuevoTitulo !== null && nuevoTitulo.trim() !== "") {
-      const nuevaDescripcion = window.prompt("Editar descripción del tema:", tema.descripcion || '');
-      if (nuevaDescripcion !== null) {
-        const id = tema.identificador || tema.id;
-        console.log("Enviando petición PUT para Tema ID:", id, "con título:", nuevoTitulo, "y descripción:", nuevaDescripcion);
+    const data = await this.modalService.prompt("Editar Tema", [
+      { name: 'titulo', label: 'Título del Tema', type: 'text', value: tema.titulo },
+      { name: 'descripcion', label: 'Descripción', type: 'textarea', value: tema.descripcion || '' }
+    ]);
 
-        this.foroService.editTema(id, nuevoTitulo, nuevaDescripcion).subscribe({
-          next: (res) => {
-            console.log("Respuesta del servidor al editar tema:", res);
-            tema.titulo = nuevoTitulo;
-            tema.descripcion = nuevaDescripcion;
-            this.foroService.clearCache();
-            this.toastService.success("Tema actualizado correctamente");
-            // Removemos la cache individual de este tema por si entra
-            sessionStorage.removeItem(`tema_slug_${tema.slug}_cache`);
-            this.cdr.detectChanges();
-          },
-          error: (err) => {
-            console.error("Error al editar el tema", err);
-            this.toastService.error("Error al editar el tema.");
-          }
-        });
-      }
+    if (data && data.titulo?.trim()) {
+      const id = tema.identificador || tema.id;
+      this.foroService.editTema(id, data.titulo, data.descripcion).subscribe({
+        next: (res) => {
+          tema.titulo = data.titulo;
+          tema.descripcion = data.descripcion;
+          this.foroService.clearCache();
+          this.toastService.success("Tema actualizado correctamente");
+          sessionStorage.removeItem(`tema_slug_${tema.slug}_cache`);
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error("Error al editar el tema", err);
+          this.toastService.error("Error al editar el tema.");
+        }
+      });
     }
   }
 
   // --- ACCIONES CATEGORIA ---
-  borrarCategoria(cat: any, event: Event) {
+  async borrarCategoria(cat: any, event: Event) {
     event.stopPropagation();
-    const confirmacion = window.confirm(`¿Estás seguro de que deseas eliminar la categoría "${cat.nombre}"? Esto podría eliminar los temas dentro de ella.`);
+    const confirmacion = await this.modalService.confirm(
+      "Eliminar Categoría",
+      `¿Estás seguro de que deseas eliminar la categoría "${cat.nombre}"? Esto podría eliminar los temas dentro de ella.`,
+      true
+    );
     if (confirmacion) {
       const id = cat.identificador || cat.id;
       this.foroService.deleteCategoria(id).subscribe({
@@ -251,17 +259,17 @@ export class Foro implements OnInit {
     }
   }
 
-  editarCategoria(cat: any, event: Event) {
+  async editarCategoria(cat: any, event: Event) {
     event.stopPropagation();
-    const nuevoNombre = window.prompt("Editar nombre de la categoría:", cat.nombre);
-    if (nuevoNombre !== null && nuevoNombre.trim() !== "") {
-      const id = cat.identificador || cat.id;
-      console.log("Enviando petición PUT para Categoría ID:", id, "con nombre:", nuevoNombre);
+    const data = await this.modalService.prompt("Editar Categoría", [
+      { name: 'nombre', label: 'Nombre de la Categoría', type: 'text', value: cat.nombre }
+    ]);
 
-      this.foroService.editCategoria(id, nuevoNombre).subscribe({
+    if (data && data.nombre?.trim()) {
+      const id = cat.identificador || cat.id;
+      this.foroService.editCategoria(id, data.nombre).subscribe({
         next: (res) => {
-          console.log("Respuesta del servidor al editar categoría:", res);
-          cat.nombre = nuevoNombre;
+          cat.nombre = data.nombre;
           this.foroService.clearCache();
           this.cdr.detectChanges();
         },
@@ -274,7 +282,7 @@ export class Foro implements OnInit {
   }
 
   // --- ACCIÓN CREAR TEMA ---
-  crearTema() {
+  async crearTema() {
     const usuarioActual = this.usuarioService.getUsuarioLogueado();
     if (!usuarioActual) {
       this.toastService.warning("Debes iniciar sesión para crear un tema.");
@@ -286,33 +294,31 @@ export class Foro implements OnInit {
       return;
     }
 
-    const titulo = window.prompt(`Crear nuevo tema en "${this.categoriaActiva.nombre}":\n\nIntroduce el título:`);
-    if (titulo !== null && titulo.trim() !== "") {
-      const descripcion = window.prompt("Introduce la descripción para el tema:");
-      if (descripcion !== null) {
-        const nuevoTema = {
-          titulo: titulo.trim(),
-          descripcion: descripcion.trim(),
-          slug: this.generarSlug(titulo.trim()),
-          categoria: { identificador: this.categoriaActiva.identificador || this.categoriaActiva.id },
-          usuario: { identificador: usuarioActual.identificador || usuarioActual.id }
-        };
+    const data = await this.modalService.prompt(`Nuevo Tema en "${this.categoriaActiva.nombre}"`, [
+      { name: 'titulo', label: 'Título del Tema', type: 'text', placeholder: 'Escribe un título atractivo...' },
+      { name: 'descripcion', label: 'Descripción', type: 'textarea', placeholder: '¿De qué trata este tema?' }
+    ]);
 
-        console.log("Creando tema:", nuevoTema);
-        this.foroService.createTema(nuevoTema).subscribe({
-          next: (res) => {
-            console.log("Tema creado:", res);
-            this.toastService.success("¡Tema creado con éxito!");
-            // Refrescar lista
-            this.foroService.clearCache();
-            this.cargarDatosIniciales();
-          },
-          error: (err) => {
-            console.error("Error al crear el tema", err);
-            this.toastService.error("Error al crear el tema.");
-          }
-        });
-      }
+    if (data && data.titulo?.trim()) {
+      const nuevoTema = {
+        titulo: data.titulo.trim(),
+        descripcion: (data.descripcion || '').trim(),
+        slug: this.generarSlug(data.titulo.trim()),
+        categoria: { identificador: this.categoriaActiva.identificador || this.categoriaActiva.id },
+        usuario: { identificador: usuarioActual.identificador || usuarioActual.id }
+      };
+
+      this.foroService.createTema(nuevoTema).subscribe({
+        next: (res) => {
+          this.toastService.success("¡Tema creado con éxito!");
+          this.foroService.clearCache();
+          this.cargarDatosIniciales();
+        },
+        error: (err) => {
+          console.error("Error al crear el tema", err);
+          this.toastService.error("Error al crear el tema.");
+        }
+      });
     }
   }
 
