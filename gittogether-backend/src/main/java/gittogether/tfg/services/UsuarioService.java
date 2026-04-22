@@ -49,4 +49,10 @@ public class UsuarioService {
 		return usuarioRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("El usuario con ID " + id + " no existe"));
 	}
+
+	public Usuario actualizarPerfil(int id, String descripcion) {
+		Usuario usuario = obtenerPorId(id);
+		usuario.setDescripcion(descripcion);
+		return usuarioRepository.save(usuario);
+	}
 }

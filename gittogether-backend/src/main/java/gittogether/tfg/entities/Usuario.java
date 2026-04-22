@@ -57,6 +57,9 @@ public class Usuario {
 	@Column(name = "fecha_registro", nullable = false)
 	private LocalDate fechaRegistro;
 
+	@Column(name = "descripcion", columnDefinition = "TEXT")
+	private String descripcion;
+
 	public int getIdentificador() {
 		return identificador;
 	}
@@ -113,11 +116,19 @@ public class Usuario {
 		this.fechaRegistro = fechaRegistro;
 	}
 
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
 	@Override
 	public String toString() {
 		return "Usuario [identificador=" + identificador + ", nombre=" + nombre + ", email=" + email + ", password="
 				+ password + ", avatar=" + Arrays.toString(avatar) + ", rol=" + rol + ", fechaRegistro=" + fechaRegistro
-				+ "]";
+				+ ", descripcion=" + descripcion + "]";
 	}
 
 }

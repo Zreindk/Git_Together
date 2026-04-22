@@ -22,6 +22,10 @@ export class NavbarComponent implements OnInit {
     }
   }
 
+  goToProfile() {
+    this.router.navigate(['/perfil']);
+  }
+
   onLogout() {
     this.apiUsuario.logout();
     this.router.navigate(['/login']);

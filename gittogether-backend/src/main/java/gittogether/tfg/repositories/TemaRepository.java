@@ -21,4 +21,6 @@ public interface TemaRepository extends JpaRepository<Tema, Integer> {
 
     @EntityGraph(attributePaths = { "usuario", "categoria" })
     java.util.Optional<Tema> findBySlug(String slug);
+
+    int countByUsuarioIdentificador(int usuarioId);
 }

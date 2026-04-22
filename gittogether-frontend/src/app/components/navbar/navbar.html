@@ -8,7 +8,7 @@
     </div>
 
     <div class="header-user" *ngIf="usuarioLogueado">
-        <div class="user-info-section">
+        <div class="user-info-section" (click)="goToProfile()" style="cursor: pointer;" title="Ver Perfil">
             <div class="avatar-container">
                 <img [src]="usuarioLogueado.avatar || 'https://ui-avatars.com/api/?name=' + usuarioLogueado.nombre + '&background=0D8ABC&color=fff'" 
                      alt="Avatar" class="user-avatar">

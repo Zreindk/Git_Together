@@ -3,6 +3,7 @@ import { Login } from './components/login/login';
 import { Register } from './components/register/register';
 import { Foro } from './components/foro/foro';
 import { ForoTema } from './components/foro-tema/foro-tema';
+import { Perfil } from './components/perfil/perfil';
 import { authGuard } from './components/services/auth.guard'; // Importamos el guardián de rutas
 
 export const routes: Routes = [
@@ -24,6 +25,11 @@ export const routes: Routes = [
   {
     path: 'foro/tema/:slug',
     component: ForoTema,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'perfil',
+    component: Perfil,
     canActivate: [authGuard]
   }
 ];

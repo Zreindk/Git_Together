@@ -17,4 +17,5 @@ public interface MensajeRepository extends JpaRepository<Mensaje, Integer> {
 	// Spring crea el SQL buscando por el ID del tema y ordenando por fecha
 	List<Mensaje> findByTemaIdentificadorOrderByFechaCreacionAsc(int temaId);
 
+    int countByUsuarioIdentificador(int usuarioId);
 }

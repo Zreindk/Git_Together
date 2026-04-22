@@ -25,6 +25,20 @@ export class Usuario {
     );
   }
 
+  getStats(id: number): Observable<any> {
+    return this.http.get<any>(`${this.API_URL}/${id}/stats`);
+  }
+
+  updatePerfil(id: number, datos: any): Observable<any> {
+    return this.http.put<any>(`${this.API_URL}/${id}`, datos).pipe(
+      tap(usuarioActualizado => {
+        if (usuarioActualizado) {
+          localStorage.setItem('usuarioLogueado', JSON.stringify(usuarioActualizado));
+        }
+      })
+    );
+  }
+
   // Realiza la petición de registro
   register(datos: any): Observable<any> {
     return this.http.post<any>(`${this.API_URL}/register`, datos);
