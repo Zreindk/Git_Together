@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gittogether.tfg.entities.Mensaje;
 import gittogether.tfg.services.MensajeService;
+import gittogether.tfg.services.S3Service;
 
 @RestController
 @RequestMapping("/api/mensajes-foro")
@@ -27,10 +28,14 @@ public class MensajeController {
     @Autowired
     private MensajeService mensajeService;
 
+    @Autowired
+    private S3Service s3Service;
+
     @PostMapping("/registrar")
     public ResponseEntity<?> crearMensaje(@RequestBody Mensaje mensaje) {
         try {
             Mensaje nuevoMensaje = mensajeService.crearMensaje(mensaje);
+            s3Service.procesarAvatar(nuevoMensaje.getUsuario());
             return ResponseEntity.ok(nuevoMensaje);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
@@ -43,12 +48,15 @@ public class MensajeController {
         if (mensajes.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+        mensajes.forEach(m -> s3Service.procesarAvatar(m.getUsuario()));
         return ResponseEntity.ok(mensajes);
     }
 
     @GetMapping("/tema/{temaId}")
     public ResponseEntity<List<Mensaje>> obtenerPorTema(@PathVariable int temaId) {
-        return ResponseEntity.ok(mensajeService.obtenerMensajesDeUnTema(temaId));
+        List<Mensaje> mensajes = mensajeService.obtenerMensajesDeUnTema(temaId);
+        mensajes.forEach(m -> s3Service.procesarAvatar(m.getUsuario()));
+        return ResponseEntity.ok(mensajes);
     }
     
     @DeleteMapping("/{id}")
@@ -66,6 +74,7 @@ public class MensajeController {
         try {
             String nuevoContenido = payload.get("contenido");
             Mensaje mensajeActualizado = mensajeService.editarMensaje(id, nuevoContenido);
+            s3Service.procesarAvatar(mensajeActualizado.getUsuario());
             return ResponseEntity.ok(mensajeActualizado);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body("Error al editar: " + e.getMessage());

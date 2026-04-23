@@ -72,6 +72,7 @@ public class UsuarioController {
 
             // 4. Guardar en BD
             Usuario nuevoUsuario = usuarioService.registrarUsuario(usuario);
+            s3Service.procesarAvatar(nuevoUsuario);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevoUsuario);
 
         } catch (Exception e) {
@@ -84,7 +85,9 @@ public class UsuarioController {
 	// GET: http://localhost:8080/api/usuarios
 	@GetMapping
 	public ResponseEntity<List<Usuario>> listarUsuarios() {
-		return ResponseEntity.ok(usuarioService.obtenerTodos());
+		List<Usuario> usuarios = usuarioService.obtenerTodos();
+		s3Service.procesarAvatares(usuarios);
+		return ResponseEntity.ok(usuarios);
 	}
 
 	// GET: http://localhost:8080/api/usuarios/{id}
@@ -92,20 +95,37 @@ public class UsuarioController {
 	public ResponseEntity<?> obtenerUsuarioPorId(@PathVariable int id) {
 		try {
 			Usuario usuario = usuarioService.obtenerPorId(id);
+			s3Service.procesarAvatar(usuario);
 			return ResponseEntity.ok(usuario);
 		} catch (RuntimeException e) {
 			return ResponseEntity.status(404).body(e.getMessage());
 		}
 	}
 
-	@PutMapping("/{id}")
-	public ResponseEntity<?> actualizarPerfil(@PathVariable int id, @RequestBody Map<String, String> body) {
+	@PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> actualizarPerfil(
+			@PathVariable int id, 
+			@RequestPart("usuario") String usuarioJson, 
+			@RequestPart(value = "avatar", required = false) MultipartFile archivo) {
 		try {
-			String descripcion = body.get("descripcion");
-			Usuario usuario = usuarioService.actualizarPerfil(id, descripcion);
+			ObjectMapper objectMapper = new ObjectMapper();
+			objectMapper.registerModule(new JavaTimeModule());
+			Usuario usuarioDatos = objectMapper.readValue(usuarioJson, Usuario.class);
+			
+			String urlImagen = null;
+			if (archivo != null && !archivo.isEmpty()) {
+				urlImagen = s3Service.subirArchivo(archivo);
+			} else if (usuarioDatos.getAvatar() != null && usuarioDatos.getAvatar().equalsIgnoreCase("null")) {
+				// Si no hay archivo pero el JSON dice "null", es que queremos borrar la foto
+				urlImagen = "null";
+			}
+
+			Usuario usuario = usuarioService.actualizarPerfil(id, usuarioDatos.getDescripcion(), urlImagen);
+			s3Service.procesarAvatar(usuario);
 			return ResponseEntity.ok(usuario);
-		} catch (RuntimeException e) {
-			return ResponseEntity.status(400).body(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(400).body("Error al actualizar el perfil: " + e.getMessage());
 		}
 	}
 
@@ -126,6 +146,7 @@ public class UsuarioController {
 	    Usuario usuario = usuarioService.autenticar(loginRequest.getIdentificador(), loginRequest.getPassword());
 
 	    if (usuario != null) {
+	        s3Service.procesarAvatar(usuario);
 	        // Generamos un token
 	    	String jwtToken = JwtUtil.generateToken(usuario.getEmail());
 

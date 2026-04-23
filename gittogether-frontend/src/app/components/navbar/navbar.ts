@@ -40,9 +40,7 @@ export class NavbarComponent implements OnInit {
   }
 
   getAvatarUrl(): SafeUrl | string | null {
-    const url = this.usuarioLogueado?.avatar;
-    if (!url || this.imageError) return null;
-    return this.sanitizer.bypassSecurityTrustUrl(encodeURI(url.trim()));
+    return this.apiUsuario.getAvatarUrl(this.usuarioLogueado?.avatar);
   }
 
   handleImageError() {

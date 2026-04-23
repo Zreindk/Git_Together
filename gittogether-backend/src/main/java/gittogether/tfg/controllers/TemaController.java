@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import gittogether.tfg.entities.Tema;
 import gittogether.tfg.services.TemaService;
+import gittogether.tfg.services.S3Service;
 
 @RestController
 @RequestMapping("/api/temas")
@@ -28,33 +29,48 @@ public class TemaController {
 	@Autowired
 	private TemaService temaService;
 
+	@Autowired
+	private S3Service s3Service;
+
 	@GetMapping
 	public List<Tema> listar() {
-		return temaService.listarTemas();
+		List<Tema> temas = temaService.listarTemas();
+		temas.forEach(t -> s3Service.procesarAvatar(t.getUsuario()));
+		return temas;
 	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<Tema> obtenerPorId(@PathVariable int id) {
 		return temaService.obtenerTemaPorId(id)
-				.map(ResponseEntity::ok)
+				.map(t -> {
+					s3Service.procesarAvatar(t.getUsuario());
+					return ResponseEntity.ok(t);
+				})
 				.orElse(ResponseEntity.notFound().build());
 	}
 
 	@GetMapping("/slug/{slug}")
 	public ResponseEntity<Tema> obtenerPorSlug(@PathVariable String slug) {
 		return temaService.obtenerTemaPorSlug(slug)
-				.map(ResponseEntity::ok)
+				.map(t -> {
+					s3Service.procesarAvatar(t.getUsuario());
+					return ResponseEntity.ok(t);
+				})
 				.orElse(ResponseEntity.notFound().build());
 	}
 
 	@GetMapping("/categoria/{id}")
 	public List<Tema> listarPorCategoria(@PathVariable int id) {
-		return temaService.obtenerTemasPorCategoria(id);
+		List<Tema> temas = temaService.obtenerTemasPorCategoria(id);
+		temas.forEach(t -> s3Service.procesarAvatar(t.getUsuario()));
+		return temas;
 	}
 
 	@PostMapping
 	public Tema crear(@RequestBody Tema tema) {
-		return temaService.crearTema(tema);
+		Tema nuevoTema = temaService.crearTema(tema);
+		s3Service.procesarAvatar(nuevoTema.getUsuario());
+		return nuevoTema;
 	}
 
 	@DeleteMapping("/{id}")
@@ -73,6 +89,7 @@ public class TemaController {
 			String nuevoTitulo = payload.get("titulo");
 			String nuevaDescripcion = payload.get("descripcion");
 			Tema temaActualizado = temaService.editarTema(id, nuevoTitulo, nuevaDescripcion);
+			s3Service.procesarAvatar(temaActualizado.getUsuario());
 			return ResponseEntity.ok(temaActualizado);
 		} catch (RuntimeException e) {
 			return ResponseEntity.badRequest().body("Error al editar el tema: " + e.getMessage());

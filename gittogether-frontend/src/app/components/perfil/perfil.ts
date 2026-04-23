@@ -40,12 +40,7 @@ export class Perfil implements OnInit {
   }
 
   getAvatarUrl(): SafeUrl | string | null {
-    const url = this.usuarioLogueado?.avatar;
-    if (!url || this.imageError) return null;
-    
-    const cleanUrl = encodeURI(url.trim());
-    console.log("Intentando cargar avatar desde:", cleanUrl);
-    return this.sanitizer.bypassSecurityTrustUrl(cleanUrl);
+    return this.usuarioService.getAvatarUrl(this.usuarioLogueado?.avatar);
   }
 
   handleImageError() {
@@ -138,7 +133,8 @@ export class Perfil implements OnInit {
     this.usuarioService.updatePerfil(userId, {}, archivo).subscribe({
       next: (usuarioActualizado) => {
         this.toastService.success("Foto de perfil actualizada");
-        // No hace falta asignar this.usuarioLogueado porque ya estamos suscritos en ngOnInit
+        this.avatarPreview = null; // Limpiamos la preview para usar la URL real
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error("Error al subir el avatar", err);
@@ -146,5 +142,29 @@ export class Perfil implements OnInit {
         this.avatarPreview = null; // Reset preview on error
       }
     });
+  }
+
+  async eliminarAvatar() {
+    const confirmacion = await this.modalService.confirm(
+      "Eliminar foto",
+      "¿Estás seguro de que deseas eliminar tu foto de perfil?",
+      true
+    );
+
+    if (confirmacion) {
+      const userId = this.usuarioLogueado?.identificador || this.usuarioLogueado?.id;
+      // Enviamos "null" como string para que el backend sepa que queremos borrarlo
+      this.usuarioService.updatePerfil(userId, { avatar: "null" }).subscribe({
+        next: (usuarioActualizado) => {
+          this.toastService.success("Foto de perfil eliminada");
+          this.imageError = false;
+          this.cdr.detectChanges();
+        },
+        error: (err) => {
+          console.error("Error al eliminar el avatar", err);
+          this.toastService.error("No se pudo eliminar la foto.");
+        }
+      });
+    }
   }
 }

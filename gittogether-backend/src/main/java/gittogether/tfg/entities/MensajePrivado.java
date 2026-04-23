@@ -39,12 +39,12 @@ public class MensajePrivado {
 	private LocalDate fechaInicio;
 
 	@ManyToOne
-	@JsonIgnoreProperties({ "password", "avatar", "fechaRegistro", "rol" })
+	@JsonIgnoreProperties({ "password", "fechaRegistro", "rol" })
 	@JoinColumn(name = "emisor_usuario_id", foreignKey = @ForeignKey(name = "FK_MENSAJE_PRIVADO_EMISOR"), nullable = false)
 	private Usuario emisor;
 
 	@ManyToOne
-	@JsonIgnoreProperties({ "password", "avatar", "fechaRegistro", "rol" })
+	@JsonIgnoreProperties({ "password", "fechaRegistro", "rol" })
 	@JoinColumn(name = "receptor_usuario_id", foreignKey = @ForeignKey(name = "FK_MENSAJE_PRIVADO_RECEPTOR"), nullable = false)
 	private Usuario receptor;
 

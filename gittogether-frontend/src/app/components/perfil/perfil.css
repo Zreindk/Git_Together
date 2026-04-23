@@ -212,6 +212,31 @@
     transform: scale(1.1);
 }
 
+.delete-avatar-btn {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 36px;
+    height: 36px;
+    background: var(--bg-surface-elevated);
+    border: 2px solid var(--bg-dark);
+    border-radius: 50%;
+    color: #f85149; /* Red color for delete */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-base);
+    box-shadow: var(--shadow-md);
+    z-index: 2;
+}
+
+.delete-avatar-btn:hover {
+    background: #f85149;
+    color: #ffffff;
+    transform: scale(1.1);
+}
+
 .profile-online-badge {
     position: absolute;
     bottom: 8px;

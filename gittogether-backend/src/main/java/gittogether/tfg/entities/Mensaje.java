@@ -44,7 +44,7 @@ public class Mensaje {
 	private Tema tema;
 
 	// Evita que al ver un mensaje se cargue todo el árbol de categorías
-	@JsonIgnoreProperties({ "password", "avatar", "fechaRegistro" })
+	@JsonIgnoreProperties({ "password", "fechaRegistro" })
 	@ManyToOne
 	@JoinColumn(name = "usuario_id", foreignKey = @ForeignKey(name = "FK_MENSAJE_USUARIO"), nullable = false)
 	private Usuario usuario;

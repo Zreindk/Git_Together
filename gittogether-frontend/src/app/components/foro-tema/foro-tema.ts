@@ -24,7 +24,7 @@ export class ForoTema implements OnInit {
   mensajes: any[] = [];
   cargando: boolean = true;
   skeletonMensajes = Array(3).fill(0);
-  
+
   // Para controlar qué menú de opciones (3 puntos) está abierto
   activeMenuId: string | number | null = null;
 
@@ -302,6 +302,14 @@ export class ForoTema implements OnInit {
       next: (res) => {
         console.log("Comentario publicado:", res);
         this.toastService.success("¡Mensaje enviado!");
+
+        // --- DEFENSA PARA EL AVATAR ---
+        // Si el servidor nos devuelve el usuario sin avatar o con la llave antigua,
+        // usamos el avatar que tenemos en la sesión local que ya está prefirmado y funcionando.
+        if (res.usuario && (!res.usuario.avatar || !res.usuario.avatar.startsWith('http'))) {
+          res.usuario.avatar = usuarioActual.avatar;
+        }
+
         // Añadir el nuevo mensaje a la lista local
         this.mensajes.push(res);
         if (this.tema) {

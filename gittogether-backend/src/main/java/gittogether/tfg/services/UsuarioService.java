@@ -18,6 +18,9 @@ public class UsuarioService {
 	@Autowired
 	private UsuarioRepository usuarioRepository;
 
+	@Autowired
+	private S3Service s3Service;
+
 
 	public Usuario autenticar(String identificador, String password) {
 	    // Buscamos por nombre O por email usando el mismo texto
@@ -50,9 +53,28 @@ public class UsuarioService {
 				.orElseThrow(() -> new RuntimeException("El usuario con ID " + id + " no existe"));
 	}
 
-	public Usuario actualizarPerfil(int id, String descripcion) {
+	public Usuario actualizarPerfil(int id, String descripcion, String avatarUrl) {
 		Usuario usuario = obtenerPorId(id);
-		usuario.setDescripcion(descripcion);
+		
+		if (descripcion != null) {
+			usuario.setDescripcion(descripcion);
+		}
+
+		// Si nos llega un nuevo avatar (o la instrucción de borrarlo)
+		if (avatarUrl != null) {
+			// 1. Borramos la foto antigua de S3 si existía
+			if (usuario.getAvatar() != null && !usuario.getAvatar().isEmpty()) {
+				s3Service.eliminarArchivo(usuario.getAvatar());
+			}
+			
+			// 2. Asignamos la nueva llave (si es "" o "null" lo tratamos como borrado)
+			if (avatarUrl.isEmpty() || avatarUrl.equalsIgnoreCase("null")) {
+				usuario.setAvatar(null);
+			} else {
+				usuario.setAvatar(avatarUrl);
+			}
+		}
+		
 		return usuarioRepository.save(usuario);
 	}
 }

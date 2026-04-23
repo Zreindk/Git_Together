@@ -1,18 +1,34 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, BehaviorSubject } from 'rxjs';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Injectable({
   providedIn: 'root'
 })
 export class Usuario {
   private API_URL = 'http://localhost:8080/api/usuarios';
+  private sanitizer = inject(DomSanitizer);
   
   // Subject reactivo para que toda la app sepa cuando cambia el usuario
   private currentUserSubject = new BehaviorSubject<any>(this.getUsuarioLogueado());
   public currentUser$ = this.currentUserSubject.asObservable();
 
   constructor(private http: HttpClient) { }
+
+  getAvatarUrl(avatar: string | null): SafeUrl | string | null {
+    if (!avatar) return null;
+    try {
+      const cleanAvatar = avatar.trim();
+      // Si ya es una URL completa (empieza por http), no la codificamos para no romper la firma de S3
+      if (cleanAvatar.startsWith('http')) {
+        return this.sanitizer.bypassSecurityTrustUrl(cleanAvatar);
+      }
+      return this.sanitizer.bypassSecurityTrustUrl(encodeURI(cleanAvatar));
+    } catch (e) {
+      return null;
+    }
+  }
 
   login(datos: any): Observable<any> {
     return this.http.post<any>(`${this.API_URL}/login`, datos).pipe(

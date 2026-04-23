@@ -45,12 +45,24 @@
                         <div *ngIf="!avatarPreview && (!usuarioLogueado?.avatar || imageError)" class="profile-initials-avatar">
                             {{ getInitials() }}
                         </div>
-                        <button class="edit-avatar-btn" (click)="fileInput.click()">
+                        <button class="edit-avatar-btn" (click)="fileInput.click()" title="Cambiar foto">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
                                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                                 <circle cx="12" cy="13" r="4"></circle>
                             </svg>
                         </button>
+
+                        <!-- Botón para eliminar avatar -->
+                        <button *ngIf="usuarioLogueado?.avatar && !avatarPreview" 
+                                class="delete-avatar-btn" 
+                                (click)="eliminarAvatar()" 
+                                title="Eliminar foto">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 16px; height: 16px;">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                            </svg>
+                        </button>
+                        
                         <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;">
                     </div>
 
@@ -64,14 +76,6 @@
                         </div>
                         <h1 class="profile-name">{{ usuarioLogueado?.nombre || 'Usuario Desconocido' }}</h1>
                         <p class="profile-email">{{ usuarioLogueado?.email || 'email@oculto.com' }}</p>
-                        
-                        <!-- Enlace de diagnóstico -->
-                        <a *ngIf="usuarioLogueado?.avatar" 
-                           [href]="usuarioLogueado.avatar" 
-                           target="_blank" 
-                           style="font-size: 0.75rem; color: var(--accent-color); text-decoration: underline; margin-top: 5px; display: inline-block;">
-                           ¿No ves tu foto? Haz clic aquí para comprobar la URL
-                        </a>
                     </div>
                 </div>
             </section>

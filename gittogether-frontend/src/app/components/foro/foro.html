@@ -118,6 +118,12 @@
                             <h4 class="tema-title">{{ tema.titulo }}</h4>
                             <div class="tema-meta">
                                 <span class="tema-author-wrapper">
+                                    <div class="tema-author-avatar-container">
+                                        <img *ngIf="tema.usuario?.avatar" [src]="usuarioService.getAvatarUrl(tema.usuario.avatar)" class="tema-author-avatar">
+                                        <div *ngIf="!tema.usuario?.avatar" class="tema-author-fallback">
+                                            {{ (tema.usuario?.nombre || 'U')[0].toUpperCase() }}
+                                        </div>
+                                    </div>
                                     <span class="tema-author">{{ tema.usuario?.nombre || 'Usuario' }}</span>
                                 </span>
                                 <span class="tema-date">{{ tema.fechaCreacion ? (tema.fechaCreacion |

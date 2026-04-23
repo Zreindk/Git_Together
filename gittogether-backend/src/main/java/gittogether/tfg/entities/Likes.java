@@ -30,7 +30,7 @@ public class Likes {
 	@Column(name = "fecha", nullable = false)
 	private LocalDate fecha;
 
-	@JsonIgnoreProperties({ "password", "avatar", "rol" }) // Solo necesitamos el ID o nombre de quien dio like
+	@JsonIgnoreProperties({ "password", "rol" }) // Solo necesitamos el ID o nombre de quien dio like
 	@ManyToOne
 	@JoinColumn(name = "usuario_id", foreignKey = @ForeignKey(name = "FK_LIKES_USUARIO"), nullable = false)
 	private Usuario usuario;

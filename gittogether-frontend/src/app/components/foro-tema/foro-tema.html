@@ -68,7 +68,12 @@
                         <h1 class="tema-title-main">{{ tema.titulo || 'Sin título' }}</h1>
 
                         <div class="tema-author-info">
-                            <div class="author-avatar">{{ (tema.usuario?.nombre || 'U')[0].toUpperCase() }}</div>
+                            <div class="author-avatar-container">
+                                <img *ngIf="tema.usuario?.avatar" [src]="usuarioService.getAvatarUrl(tema.usuario.avatar)" class="author-avatar-img">
+                                <div *ngIf="!tema.usuario?.avatar" class="author-avatar-fallback">
+                                    {{ (tema.usuario?.nombre || 'U')[0].toUpperCase() }}
+                                </div>
+                            </div>
                             <div class="author-details">
                                 <span class="author-name">{{ tema.usuario?.nombre || 'Usuario' }}</span>
                                 <span class="tema-full-date">Publicado el {{ tema.fechaCreacion | date:'fullDate'
@@ -106,9 +111,11 @@
                         <!-- Lista Real de Mensajes -->
                         <div class="comment-card" *ngFor="let mensaje of mensajes; let i = index">
                             <div class="comment-sidebar">
-                                <div class="comment-avatar"
-                                    [class.op-avatar]="tema && mensaje.usuario?.identificador === tema.usuario?.identificador">
-                                    {{ (mensaje.usuario?.nombre || 'U')[0].toUpperCase() }}
+                                <div class="comment-avatar-container" [class.op-avatar]="tema && mensaje.usuario?.identificador === tema.usuario?.identificador">
+                                    <img *ngIf="mensaje.usuario?.avatar" [src]="usuarioService.getAvatarUrl(mensaje.usuario.avatar)" class="comment-avatar-img">
+                                    <div *ngIf="!mensaje.usuario?.avatar" class="comment-avatar-fallback">
+                                        {{ (mensaje.usuario?.nombre || 'U')[0].toUpperCase() }}
+                                    </div>
                                 </div>
                                 <div class="comment-line" *ngIf="i < mensajes.length - 1"></div>
                             </div>
