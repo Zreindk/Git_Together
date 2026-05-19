@@ -106,7 +106,7 @@ Una vez que el backend esté en funcionamiento, puedes acceder a la interfaz int
 
 ## 🧪 Ejecución de Pruebas
 
-- **Backend:** `mvn test` (Incluye pruebas unitarias con **JUnit 5** y **Mockito** para validación de datos).
+- **Backend:** `mvn test` (Incluye pruebas unitarias con **JUnit 5** para validación de datos).
 - **Frontend:** `npm test`
 
 ---
